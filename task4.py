@@ -57,6 +57,34 @@ Enter a command: all
 Jime: 0501234356 
 Enter a command:
 """
+
+def input_error(func):
+    """ Декоратор для обробки помилок введення користувача.
+    Параметри:
+    func (function): Функція, яку потрібно обгорнути декоратором.
+    Повертає:
+    function: Функція, яка обробляє помилки введення та повертає відповідні повідомлення."""
+    
+    # Внутрішня функція, яка обробляє виклики функції
+    def inner(*args, **kwargs):
+        # Спробуємо виконати функцію. Якщо виникне помилка, вона буде оброблена в except блоках
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            # Якщо виникла помилка ValueError, повертаємо повідомлення про помилку
+            return "Give me name and phone please."
+        except KeyError:
+            # Якщо виникла помилка KeyError, повертаємо повідомлення про відсутність контакту
+            return "Contact not found. Please check the name."
+        except IndexError:
+            # Якщо виникла помилка IndexError, повертаємо повідомлення про неправильну кількість аргументів
+            return "Invalid command. Please provide the correct number of arguments."
+        except Exception as e:
+            # Обробка інших винятків, які можуть виникнути
+            return f"An unexpected error occurred: {str(e)}"
+    # Повертаємо внутрішню функцію
+    return inner
+
 def parse_input(user_input):
     """ Функція для розбору введеного користувачем рядка на команду та аргументи.
     Параметри:
@@ -70,6 +98,8 @@ def parse_input(user_input):
     # Повертаємо команду та аргументи
     return cmd, *args
 
+@input_error
+# Декоратор input_error обгортає функцію add_contact для обробки помилок введення користувача
 def add_contact(args, contacts):
     """ Функція для додавання нового контакту до словника контактів.
     Параметри:
@@ -77,10 +107,12 @@ def add_contact(args, contacts):
     contacts (dict): Словник, де зберігаються контакти.
     Повертає:
     str: Повідомлення про успішне додавання контакту."""
-    # Перевіряємо, чи передано правильну кількість аргументів
-    if len(args) != 2:
-        # Якщо аргументів не два, повертаємо повідомлення про помилку
-        return "Invalid command. Usage: add username phone"
+    
+    # # Перевіряємо, чи передано правильну кількість аргументів
+    # if len(args) != 2:
+    #     # Якщо аргументів не два, повертаємо повідомлення про помилку
+    #     return "Invalid command. Usage: add username phone"
+    
     # Розпаковуємо аргументи в змінні name та phone
     name, phone = args
     contacts[name] = phone
@@ -93,20 +125,22 @@ def change_contact(args, contacts):
     contacts (dict): Словник, де зберігаються контакти.
     Повертає:
     str: Повідомлення про успішне оновлення контакту або про помилку."""
+    
     # Перевіряємо, чи передано правильну кількість аргументів
-    if len(args) != 2:
-        # Якщо аргументів не два, повертаємо повідомлення про помилку
-        return "Invalid command. Usage: change username phone"
+    # if len(args) != 2:
+    #     # Якщо аргументів не два, повертаємо повідомлення про помилку
+    #     return "Invalid command. Usage: change username phone"
+    
     # Розпаковуємо аргументи в змінні name та phone
     name, phone = args
     # Перевіряємо, чи існує контакт з таким ім'ям
     if name in contacts:
-        # Якщо контакт існує, оновлюємо його номер телефону
+    #     # Якщо контакт існує, оновлюємо його номер телефону
         contacts[name] = phone
         # повертаємо повідомлення про успішне оновлення контакту
         return "Contact updated."
     else:
-        # Якщо контакт не існує, повертаємо повідомлення про помилку
+    #     # Якщо контакт не існує, повертаємо повідомлення про помилку
         return f"Contact '{name}' not found."
 
 def show_phone(args, contacts):
