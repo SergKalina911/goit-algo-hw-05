@@ -182,6 +182,11 @@ def main():
     while True:
         # Отримуємо введення користувача
         user_input = input("Enter a command: ")
+        
+        # Якщо введення порожнє, пропускаємо ітерацію циклу
+        if not user_input.strip():
+            continue
+        
         # Розбираємо введення користувача на команду та аргументи
         command, *args = parse_input(user_input)
         # Перевіряємо, чи команда є однією з команд для завершення роботи
